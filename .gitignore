@@ -1,5 +1,7 @@
-/node_modules
-/bower_components
+node_modules/*
+bower_components/*
+app/build/js/vendor/*
+.idea/*
 gulp
 bower
 karma

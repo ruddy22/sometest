@@ -1,0 +1,17 @@
+doctype
+html
+    head
+        title testTask
+
+    body
+        h1 hello
+        h1 World
+        div(ng-app="testApp")
+            span(ng-bind="model.variable")
+            div(ng-controller="MainCtrl")
+                span(ng-bind="model.variable")
+                br
+                span(ng-click="changeVal()") click me
+
+        script(src="./js/vendor/angular/angular.js")
+        script(src="./js/test.js")
