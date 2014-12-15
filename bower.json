@@ -1,0 +1,25 @@
+{
+  "name": "testTask",
+  "version": "0.0.0",
+  "authors": [
+    "Alex Petrov"
+  ],
+  "homePage": "https://bitbucket.org/shikari/testtask",
+  "description": "testTask",
+  "private": true,
+  "license": "MIT",
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ],
+  "devDependencies": {
+    "jasmine": "~2.1.3"
+  },
+  "dependencies": {
+    "angular": "~1.3.6",
+    "bootstrap": "~3.3.1"
+  }
+}
