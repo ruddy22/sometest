@@ -12,10 +12,14 @@
           <label ng-bind="item.name" for="item.name"></label>
           <input ng-model="item.percent" type="number" min="0" max="100" id="item.name">
           <input ng-model="item.percent" type="range" min="0" max="100" ng-change="changeVal(item)" range-parser>
+        </div><br>
+        <div>Result
+          <div ng-repeat="item in model"><span>nodeName: {{ item.name }}, nodeLoad: {{ item.percent }}</span></div>
         </div>
       </div>
     </div>
     <script src="./js/vendor/angular/angular.js"></script>
+    <script src="./js/vendor/underscore/underscore.js"></script>
     <script src="./js/test.js"></script>
   </body>
 </html>

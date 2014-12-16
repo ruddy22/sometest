@@ -2,6 +2,11 @@ var app;
 
 app = angular.module("testApp", []);
 
+
+/*
+ * fix https://github.com/angular/angular.js/issues/9269
+ */
+
 app.directive("rangeParser", function($log) {
   return {
     require: "?ngModel",
@@ -22,9 +27,10 @@ app.directive("rangeParser", function($log) {
 });
 
 app.controller("MainCtrl", function($scope, $window) {
-  $scope.model = {};
+  var data, i, sumCompute, zeroCompute, zeroCounter, _i, _len, _ref;
+  $scope.model = [];
   $window.model = $scope.model;
-  $scope.data = {
+  data = {
     items: [
       {
         name: "item1",
@@ -38,8 +44,29 @@ app.controller("MainCtrl", function($scope, $window) {
       }
     ]
   };
-  $scope.model = $scope.data.items;
-  console.log($scope.model);
+  zeroCounter = 0;
+  zeroCompute = function(item) {
+    if (item.percent !== 0) {
+      zeroCounter = 1;
+    }
+    return item;
+  };
+  _ref = data.items;
+  for (_i = 0, _len = _ref.length; _i < _len; _i++) {
+    i = _ref[_i];
+    $scope.model.push(zeroCompute(i));
+  }
+  if (zeroCounter === 0) {
+    $scope.model[0].percent = 100;
+  }
+  sumCompute = function(items) {
+    var sum;
+    sum = _.reduce(items, function(memo, item) {
+      return memo + item.percent;
+    }, 0);
+    return sum;
+  };
+  console.log(sumCompute($scope.model));
   $scope.changeVal = function(item) {
     console.log(item);
   };

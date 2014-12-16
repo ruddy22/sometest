@@ -1,17 +1,22 @@
 doctype
 html
-    head
-        title testTask
+  head
+    title testTask
 
-    body
-        h1 hello
-        h1 World
-        div(ng-app="testApp")
-            div(ng-controller="MainCtrl")
-                div(ng-repeat="item in model")
-                    label(ng-bind="item.name" for="item.name")
-                    input(ng-model="item.percent" type="number" min=0 max=100 id="item.name")
-                    input(ng-model="item.percent" type="range" min=0 max=100 ng-change="changeVal(item)" range-parser)
+  body
+    h1 hello
+    h1 World
+    div(ng-app="testApp")
+      div(ng-controller="MainCtrl")
+        div(ng-repeat="item in model")
+          label(ng-bind="item.name" for="item.name")
+          input(ng-model="item.percent" type="number" min=0 max=100 id="item.name")
+          input(ng-model="item.percent" type="range" min=0 max=100 ng-change="changeVal(item)" range-parser)
+        br
+        div Result
+          div(ng-repeat="item in model")
+            span nodeName: {{ item.name }}, nodeLoad: {{ item.percent }}
 
-        script(src="./js/vendor/angular/angular.js")
-        script(src="./js/test.js")
+    script(src="./js/vendor/angular/angular.js")
+    script(src="./js/vendor/underscore/underscore.js")
+    script(src="./js/test.js")

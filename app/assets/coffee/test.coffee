@@ -1,5 +1,8 @@
 app = angular.module "testApp", []
 
+###
+# fix https://github.com/angular/angular.js/issues/9269
+###
 app.directive "rangeParser", ($log) ->
   return {
     require: "?ngModel"
@@ -12,11 +15,12 @@ app.directive "rangeParser", ($log) ->
       )
   }
 
+# MainCtrl
 app.controller "MainCtrl", ($scope, $window) ->
-  $scope.model = {}
+  $scope.model = []
   $window.model = $scope.model
 
-  $scope.data =
+  data =
     items: [
       name: "item1"
       percent: 0
@@ -28,8 +32,25 @@ app.controller "MainCtrl", ($scope, $window) ->
       percent: 0
     ]
 
-  $scope.model = $scope.data.items
-  console.log $scope.model
+  zeroCounter = 0
+  zeroCompute = (item) ->
+    zeroCounter = 1 if item.percent != 0
+    return item
+
+  $scope.model.push(zeroCompute i) for i in data.items
+
+  $scope.model[0].percent = 100 if zeroCounter == 0
+
+  sumCompute = (items) ->
+    sum = _.reduce( items,
+                    (memo, item)->
+                      return memo+item.percent
+                    , 0
+                  )
+    return sum
+
+  console.log sumCompute $scope.model
+
 
   $scope.changeVal = (item)->
     console.log item
