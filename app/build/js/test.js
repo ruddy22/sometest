@@ -7,9 +7,10 @@ app = angular.module("testApp", []);
  * fix https://github.com/angular/angular.js/issues/9269
  */
 
-app.directive("rangeParser", function($log) {
+app.directive("rangeParser", function() {
   return {
-    require: "?ngModel",
+    restrict: "A",
+    require: "ngModel",
     link: function(scope, element, attr, ctrl) {
       if (ctrl == null) {
         return;
@@ -26,6 +27,21 @@ app.directive("rangeParser", function($log) {
   };
 });
 
+app.directive("commaDetect", function($log) {
+  return {
+    restrict: "A",
+    require: "ngModel",
+    link: function(scope, element, attr, ctrl) {
+      if (ctrl == null) {
+        return;
+      }
+      return ctrl.$parsers.push(function(value) {
+        return 11111111111;
+      });
+    }
+  };
+});
+
 app.controller("MainCtrl", function($scope, $window) {
   var data, i, sumCompute, zeroCompute, zeroCounter, _i, _len, _ref;
   $scope.model = [];
@@ -37,9 +53,6 @@ app.controller("MainCtrl", function($scope, $window) {
         percent: 0
       }, {
         name: "item2",
-        percent: 0
-      }, {
-        name: "item3",
         percent: 0
       }
     ]
@@ -65,10 +78,6 @@ app.controller("MainCtrl", function($scope, $window) {
       return memo + item.percent;
     }, 0);
     return sum;
-  };
-  console.log(sumCompute($scope.model));
-  $scope.changeVal = function(item) {
-    console.log(item);
   };
 });
 

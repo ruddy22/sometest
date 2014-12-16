@@ -3,15 +3,34 @@ app = angular.module "testApp", []
 ###
 # fix https://github.com/angular/angular.js/issues/9269
 ###
-app.directive "rangeParser", ($log) ->
+app.directive "rangeParser", () ->
   return {
-    require: "?ngModel"
+    restrict: "A"
+    require: "ngModel"
     link: (scope, element, attr, ctrl) ->
       return unless ctrl?
       ctrl.$parsers.push( (value) ->
         val = Number(value)
         val = null if val != val
         return val
+      )
+  }
+
+app.directive "commaDetect", ($log) ->
+  return {
+    restrict: "A"
+    require: "ngModel"
+    link: (scope, element, attr, ctrl) ->
+      return unless ctrl?
+      ctrl.$parsers.push( (value) ->
+        return 11111111111
+#        return "" if typeof value == "undefined"
+#        tValue = value.replace(/,/g,'.');
+#
+#        if (tValue != value)
+#          ctrl.$setViewValue(tValue);
+#          ctrl.$render();
+#        return tValue;
       )
   }
 
@@ -26,9 +45,6 @@ app.controller "MainCtrl", ($scope, $window) ->
       percent: 0
     ,
       name: "item2"
-      percent: 0
-    ,
-      name: "item3"
       percent: 0
     ]
 
@@ -48,12 +64,5 @@ app.controller "MainCtrl", ($scope, $window) ->
                     , 0
                   )
     return sum
-
-  console.log sumCompute $scope.model
-
-
-  $scope.changeVal = (item)->
-    console.log item
-    return
 
   return
