@@ -7,11 +7,11 @@ html
         h1 hello
         h1 World
         div(ng-app="testApp")
-            span(ng-bind="model.variable")
             div(ng-controller="MainCtrl")
-                span(ng-bind="model.variable")
-                br
-                span(ng-click="changeVal()") click me
+                div(ng-repeat="item in model")
+                    label(ng-bind="item.name" for="item.name")
+                    input(ng-model="item.percent" type="number" min=0 max=100 id="item.name")
+                    input(ng-model="item.percent" type="range" min=0 max=100 ng-change="changeVal(item)" range-parser)
 
         script(src="./js/vendor/angular/angular.js")
         script(src="./js/test.js")

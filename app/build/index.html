@@ -6,8 +6,14 @@
   <body>
     <h1>hello</h1>
     <h1>World</h1>
-    <div ng-app="testApp"><span ng-bind="model.variable"></span>
-      <div ng-controller="MainCtrl"><span ng-bind="model.variable"></span><br><span ng-click="changeVal()">click me</span></div>
+    <div ng-app="testApp">
+      <div ng-controller="MainCtrl">
+        <div ng-repeat="item in model">
+          <label ng-bind="item.name" for="item.name"></label>
+          <input ng-model="item.percent" type="number" min="0" max="100" id="item.name">
+          <input ng-model="item.percent" type="range" min="0" max="100" ng-change="changeVal(item)" range-parser>
+        </div>
+      </div>
     </div>
     <script src="./js/vendor/angular/angular.js"></script>
     <script src="./js/test.js"></script>
