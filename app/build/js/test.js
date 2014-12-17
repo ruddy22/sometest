@@ -42,6 +42,12 @@ app.directive("commaDetect", function($log) {
         if (value == null) {
           return;
         }
+        if (parseInt(value) > 100) {
+          return;
+        }
+        if (value.match(/^\-/)) {
+          return;
+        }
         if (value.match(/\.$/)) {
           oldV = parseInt(value);
         } else {
@@ -53,10 +59,11 @@ app.directive("commaDetect", function($log) {
           ctrl.$render();
         }
         if (oldV != null) {
-          return oldV;
+          value = oldV;
         } else {
-          return tVal;
+          value = tVal;
         }
+        return value;
       };
       return ctrl.$parsers.push(check);
     }
@@ -64,9 +71,41 @@ app.directive("commaDetect", function($log) {
 });
 
 app.controller("MainCtrl", function($scope, $window) {
-  var data, i, sumCompute, zeroCompute, zeroCounter, _i, _len, _ref;
+  var data, findDelta, i, item, modItem, sumCompute, watchIniter, zeroCompute, zeroCounter, _i, _j, _len, _len1, _ref, _ref1;
   $scope.model = [];
+  $scope.diff = null;
   $window.model = $scope.model;
+  sumCompute = function(items) {
+    var sum;
+    sum = _.reduce(items, function(memo, item) {
+      return memo + item.percent;
+    }, 0);
+    return sum;
+  };
+  watchIniter = function(item) {
+    return $scope.$watch(function() {
+      return item;
+    }, function(newV, oldV) {
+      console.log("init");
+      console.log("nV", newV);
+      return console.log("oV", oldV);
+    }, true);
+  };
+  findDelta = function(grt, lss) {
+    return grt - lss;
+  };
+  modItem = function(item) {
+    item["getPercent"] = function() {
+      return this.percent;
+    };
+    item["incPercent"] = function(points) {
+      return this.percent + points;
+    };
+    item["decPercent"] = function(points) {
+      return this.percent - points;
+    };
+    return item;
+  };
   data = {
     items: [
       {
@@ -74,6 +113,9 @@ app.controller("MainCtrl", function($scope, $window) {
         percent: 0
       }, {
         name: "item2",
+        percent: 0
+      }, {
+        name: "item3",
         percent: 0
       }
     ]
@@ -83,6 +125,7 @@ app.controller("MainCtrl", function($scope, $window) {
     if (item.percent !== 0) {
       zeroCounter = 1;
     }
+    modItem(item);
     return item;
   };
   _ref = data.items;
@@ -93,12 +136,16 @@ app.controller("MainCtrl", function($scope, $window) {
   if (zeroCounter === 0) {
     $scope.model[0].percent = 100;
   }
-  sumCompute = function(items) {
-    var sum;
-    sum = _.reduce(items, function(memo, item) {
-      return memo + item.percent;
-    }, 0);
-    return sum;
+  _ref1 = $scope.model;
+  for (_j = 0, _len1 = _ref1.length; _j < _len1; _j++) {
+    item = _ref1[_j];
+    watchIniter(item);
+  }
+  $scope.dec = function(item) {
+    return item.decPercent(1);
+  };
+  $scope.inc = function(item) {
+    return item.incPercent(1);
   };
 });
 

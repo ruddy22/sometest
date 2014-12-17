@@ -7,11 +7,11 @@
     <h1>hello</h1>
     <h1>World</h1>
     <div ng-app="testApp">
-      <div ng-controller="MainCtrl">
+      <div ng-controller="MainCtrl" ng-cloak>
         <div ng-repeat="item in model">
-          <label ng-bind="item.name" for="item.name"></label>
-          <input ng-model="item.percent" type="text" min="0" max="100" id="item.name" step="any" comma-detect="comma-detect">
-          <input ng-model="item.percent" type="range" min="0" max="100" range-parser>
+          <label ng-bind="item.name" for="item.name"></label><span ng-click="dec(item)"><</span>
+          <input ng-model="item.percent" type="text" min="0" max="100" id="item.name" step="any" comma-detect="comma-detect"><span ng-click="inc(item)">></span>
+          <input ng-model="item.percent" type="range" min="0" max="100" range-parser="range-parser">
         </div><br>
         <div>Result
           <div ng-repeat="item in model"><span>nodeName: {{ item.name }}, nodeLoad: {{ item.percent }}</span></div>

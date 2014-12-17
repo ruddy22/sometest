@@ -16,6 +16,8 @@ app.directive "rangeParser", () ->
       )
   }
 
+# TODO show float precision (toFixed or something else)
+# TODO use on blur
 app.directive "commaDetect", ($log) ->
   return {
     restrict: "A"
@@ -26,6 +28,8 @@ app.directive "commaDetect", ($log) ->
 
       check = (value) ->
         return unless value?
+        return if parseInt(value) > 100
+        return if value.match(/^\-/)
         if value.match(/\.$/)
           oldV = parseInt(value)
         else
@@ -38,9 +42,11 @@ app.directive "commaDetect", ($log) ->
           ctrl.$render()
 
         if oldV?
-          return oldV
+          value = oldV
         else
-          return tVal
+          value = tVal
+
+        value
 
       ctrl.$parsers.push check
   }
@@ -48,7 +54,42 @@ app.directive "commaDetect", ($log) ->
 # MainCtrl
 app.controller "MainCtrl", ($scope, $window) ->
   $scope.model = []
+  $scope.diff = null
   $window.model = $scope.model
+
+  sumCompute = (items) ->
+    sum = _.reduce( items,
+                    (memo, item)->
+                      return memo+item.percent
+                    , 0
+                  )
+    sum
+
+
+  watchIniter = (item) ->
+    $scope.$watch(
+      () ->
+        item
+    ,
+      (newV,oldV) ->
+        console.log "init"
+        console.log "nV", newV
+        console.log "oV", oldV
+    ,
+      true
+    )
+
+  findDelta = (grt, lss) ->
+    return grt - lss
+
+  modItem = (item) ->
+    item["getPercent"] = ->
+      return @percent
+    item["incPercent"] = (points)->
+      return @percent+points
+    item["decPercent"] = (points)->
+      return @percent-points
+    item
 
   data =
     items: [
@@ -57,23 +98,28 @@ app.controller "MainCtrl", ($scope, $window) ->
     ,
       name: "item2"
       percent: 0
+    ,
+      name: "item3"
+      percent: 0
     ]
 
   zeroCounter = 0
   zeroCompute = (item) ->
     zeroCounter = 1 if item.percent != 0
+    modItem(item)
     return item
 
   $scope.model.push(zeroCompute i) for i in data.items
 
   $scope.model[0].percent = 100 if zeroCounter == 0
 
-  sumCompute = (items) ->
-    sum = _.reduce( items,
-                    (memo, item)->
-                      return memo+item.percent
-                    , 0
-                  )
-    return sum
+  for item in $scope.model
+    watchIniter(item)
+
+  $scope.dec = (item) ->
+    item.decPercent(1)
+
+  $scope.inc = (item) ->
+    item.incPercent(1)
 
   return
