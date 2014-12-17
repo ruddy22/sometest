@@ -52,10 +52,79 @@ app.directive "commaDetect", () ->
       ctrl.$parsers.push check
   }
 
+app.service "Data", ->
+  @dataNull =
+    items: [
+      name: "item1"
+      percent: 0
+    ,
+      name: "item2"
+      percent: 0
+    ,
+      name: "item3"
+      percent: 0
+    ]
+  @dataNorm =
+    items: [
+      name: "item1"
+      percent: 60
+    ,
+      name: "item2"
+      percent: 10
+    ,
+      name: "item3"
+      percent: 30
+    ]
+  @dataBig =
+    items: [
+      name: "item1"
+      percent: 70
+    ,
+      name: "item2"
+      percent: 30
+    ,
+      name: "item3"
+      percent: 80
+    ]
+  @dataBig =
+    items: [
+      name: "item1"
+      percent: 70
+    ,
+      name: "item2"
+      percent: 30
+    ,
+      name: "item3"
+      percent: 80
+    ]
+  @dataBig =
+    items: [
+      name: "item1"
+      percent: 70
+    ,
+      name: "item2"
+      percent: 30
+    ,
+      name: "item3"
+      percent: 80
+    ]
+  @dataSmall =
+    items: [
+      name: "item1"
+      percent: 10
+    ,
+      name: "item2"
+      percent: 20
+    ,
+      name: "item3"
+      percent: 30
+    ]
+  @
+
 # MainCtrl
 # use common sum
 # use ng-change
-app.controller "MainCtrl", ($scope, $window, defaultSum) ->
+app.controller "MainCtrl", ($scope, $window, defaultSum, Data) ->
   $scope.model = []
   $scope.diff = null
   $scope.defSum = defaultSum
@@ -81,13 +150,15 @@ app.controller "MainCtrl", ($scope, $window, defaultSum) ->
     )
     donor
 
-
   modItem = (item) ->
     item["blocked"] = false
     item["getPercent"] = ->
       @percent
     item["setPercent"] = (points)->
-      @percent = parseFloat(points)
+      if points == 1
+        @percent += parseFloat(points)
+      else
+        @percent = parseFloat(points)
       @percent
     item["incPercent"] = (points)->
       @percent += parseFloat(points)
@@ -97,27 +168,28 @@ app.controller "MainCtrl", ($scope, $window, defaultSum) ->
       @percent
     item
 
-  data =
-    items: [
-      name: "item1"
-      percent: 0
+  resolveProportion = (percent, sum) ->
+    return Math.round(percent*defaultSum/sum)
+
+  normalizeData = (data, sum) ->
+    _.each(
+      data
     ,
-      name: "item2"
-      percent: 0
-    ,
-      name: "item3"
-      percent: 0
-    ]
+      (el) ->
+        el.percent = resolveProportion(el.percent, sum)
+    )
 
-  zeroCounter = 0
-  zeroCompute = (item) ->
-    zeroCounter = 1 if item.percent != 0
-    modItem(item)
-    return item
+  loadData = (dataType = Data.dataNull) ->
+    $scope.model.push(modItem i) for i in dataType.items
 
-  $scope.model.push(zeroCompute i) for i in data.items
+  analizeData = ->
+    sum = sumCompute($scope.model)
+    switch
+      when sum == 0   then $scope.model[0].percent = 100
+      when 0 < sum < 100 or sum > 100 then normalizeData($scope.model, sum)
 
-  $scope.model[0].percent = 100 if zeroCounter == 0
+  loadData Data.dataSmall
+  do analizeData
 
   $scope.dirtySum = sumCompute($scope.model)
 
@@ -125,9 +197,9 @@ app.controller "MainCtrl", ($scope, $window, defaultSum) ->
     donor = do findDonor
     $scope.dirtySum = sumCompute($scope.model)
     $scope.diff = $scope.defSum - $scope.dirtySum
-    console.log "donor ", donor
+#    console.log "donor ", donor
     donor.setPercent($scope.diff)
-    console.log "donor ", donor
+#    console.log "donor ", donor
     $scope.dirtySum = sumCompute($scope.model)
     return
 
@@ -139,7 +211,8 @@ app.controller "MainCtrl", ($scope, $window, defaultSum) ->
     item.incPercent(1)
     do $scope.balance
 
-  $scope.set = (item, percent) ->
+  $scope.set = (item, percent = 1) ->
+    console.log item, percent
     item.setPercent(percent)
     do $scope.balance
 
