@@ -10,10 +10,10 @@ html
       div(ng-controller="MainCtrl" ng-cloak)
         div(ng-repeat="item in model")
           label(ng-bind="item.name" for="item.name")
-          span(ng-click="set(item)") <
+          span(ng-click="dec(item)") <
           input(ng-model="item.percent" type="text" min=0 max=100 id="item.name" comma-detect="comma-detect" ng-blur="set(item, item.percent)")
-          span(ng-click="set(item)") >
-          input(ng-model="item.percent" type="range" min=0 max=100 range-parser="range-parser" ng-change="set(item, item.percent)")
+          span(ng-click="inc(item)") >
+          input(ng-model="item.percent" type="range" min=0 max=100 range-parser="range-parser")
         br
         div Result
           br

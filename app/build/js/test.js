@@ -115,34 +115,6 @@ app.service("Data", function() {
       }
     ]
   };
-  this.dataBig = {
-    items: [
-      {
-        name: "item1",
-        percent: 70
-      }, {
-        name: "item2",
-        percent: 30
-      }, {
-        name: "item3",
-        percent: 80
-      }
-    ]
-  };
-  this.dataBig = {
-    items: [
-      {
-        name: "item1",
-        percent: 70
-      }, {
-        name: "item2",
-        percent: 30
-      }, {
-        name: "item3",
-        percent: 80
-      }
-    ]
-  };
   this.dataSmall = {
     items: [
       {
@@ -161,7 +133,7 @@ app.service("Data", function() {
 });
 
 app.controller("MainCtrl", function($scope, $window, defaultSum, Data) {
-  var analizeData, findDonor, loadData, modItem, normalizeData, resolveProportion, sumCompute;
+  var analiseData, findAcceptor, loadData, modItem, normalizeData, resolveProportion, sumCompute;
   $scope.model = [];
   $scope.diff = null;
   $scope.defSum = defaultSum;
@@ -173,32 +145,17 @@ app.controller("MainCtrl", function($scope, $window, defaultSum, Data) {
     }, 0);
     return sum;
   };
-  findDonor = function() {
-    var donor;
-    donor = _.min($scope.model, function(item) {
-      return item.percent;
-    });
-    return donor;
-  };
   modItem = function(item) {
     item["blocked"] = false;
     item["getPercent"] = function() {
       return this.percent;
     };
-    item["setPercent"] = function(points) {
-      if (points === 1) {
+    item["setPercent"] = function(points, type) {
+      if (points === 1 || points === -1 || type === "append") {
         this.percent += parseFloat(points);
       } else {
         this.percent = parseFloat(points);
       }
-      return this.percent;
-    };
-    item["incPercent"] = function(points) {
-      this.percent += parseFloat(points);
-      return this.percent;
-    };
-    item["decPercent"] = function(points) {
-      this.percent -= parseFloat(points);
       return this.percent;
     };
     return item;
@@ -224,7 +181,7 @@ app.controller("MainCtrl", function($scope, $window, defaultSum, Data) {
     }
     return _results;
   };
-  analizeData = function() {
+  analiseData = function() {
     var sum;
     sum = sumCompute($scope.model);
     switch (false) {
@@ -234,32 +191,54 @@ app.controller("MainCtrl", function($scope, $window, defaultSum, Data) {
         return normalizeData($scope.model, sum);
     }
   };
-  loadData(Data.dataSmall);
-  analizeData();
+  findAcceptor = function(type) {
+    var acceptor;
+    if (type === "min") {
+      acceptor = _.min($scope.model, function(item) {
+        return item.percent;
+      });
+    } else if (type === "max") {
+      acceptor = _.max($scope.model, function(item) {
+        return item.percent;
+      });
+    }
+    return acceptor;
+  };
+  loadData(Data.dataNorm);
+  analiseData();
   $scope.dirtySum = sumCompute($scope.model);
-  $scope.balance = function() {
-    var donor;
-    donor = findDonor();
+  $scope.set = function(item, percent) {
+    var after, before;
+    before = item.percent;
+    console.log("before ", before);
+    item.setPercent(percent);
+    after = item.percent;
+    console.log("after ", after);
+    console.log("compare ", after === before);
+    if (after > before) {
+      $scope.balance(percent, "max");
+    } else if (after < before) {
+      $scope.balance(percent, "min");
+    }
+  };
+  $scope.balance = function(percent, type) {
+    var acceptor;
+    acceptor = findAcceptor(type);
+    console.log("acceptor", acceptor);
     $scope.dirtySum = sumCompute($scope.model);
-    $scope.diff = $scope.defSum - $scope.dirtySum;
-    donor.setPercent($scope.diff);
+    $scope.diff = $scope.defSum - sumCompute($scope.model);
+    acceptor.setPercent($scope.diff, "append");
     $scope.dirtySum = sumCompute($scope.model);
   };
   $scope.dec = function(item) {
-    item.decPercent(1);
-    return $scope.balance();
+    if (item !== findAcceptor("min")) {
+      return $scope.set(item, -1);
+    }
   };
   $scope.inc = function(item) {
-    item.incPercent(1);
-    return $scope.balance();
-  };
-  $scope.set = function(item, percent) {
-    if (percent == null) {
-      percent = 1;
+    if ($scope.dirtySum !== 100) {
+      return $scope.set(item, 1);
     }
-    console.log(item, percent);
-    item.setPercent(percent);
-    return $scope.balance();
   };
 });
 

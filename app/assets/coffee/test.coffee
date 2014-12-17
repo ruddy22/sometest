@@ -18,7 +18,8 @@ app.directive "rangeParser", () ->
 
 app.constant "defaultSum", 100
 
-# TODO show float precision (toFixed or something else)
+# TODO show float precision (use Math lib or something else)
+# TODO manage old values for save value if letter char input
 app.directive "commaDetect", () ->
   return {
     restrict: "A"
@@ -86,28 +87,6 @@ app.service "Data", ->
       name: "item3"
       percent: 80
     ]
-  @dataBig =
-    items: [
-      name: "item1"
-      percent: 70
-    ,
-      name: "item2"
-      percent: 30
-    ,
-      name: "item3"
-      percent: 80
-    ]
-  @dataBig =
-    items: [
-      name: "item1"
-      percent: 70
-    ,
-      name: "item2"
-      percent: 30
-    ,
-      name: "item3"
-      percent: 80
-    ]
   @dataSmall =
     items: [
       name: "item1"
@@ -141,30 +120,15 @@ app.controller "MainCtrl", ($scope, $window, defaultSum, Data) ->
     )
     sum
 
-  findDonor = ->
-    donor = _.min(
-      $scope.model
-    ,
-      (item) ->
-        item.percent
-    )
-    donor
-
   modItem = (item) ->
     item["blocked"] = false
     item["getPercent"] = ->
       @percent
-    item["setPercent"] = (points)->
-      if points == 1
+    item["setPercent"] = (points, type)->
+      if points == 1 or points == -1 or type == "append"
         @percent += parseFloat(points)
       else
         @percent = parseFloat(points)
-      @percent
-    item["incPercent"] = (points)->
-      @percent += parseFloat(points)
-      @percent
-    item["decPercent"] = (points)->
-      @percent -= parseFloat(points)
       @percent
     item
 
@@ -182,38 +146,62 @@ app.controller "MainCtrl", ($scope, $window, defaultSum, Data) ->
   loadData = (dataType = Data.dataNull) ->
     $scope.model.push(modItem i) for i in dataType.items
 
-  analizeData = ->
+  analiseData = ->
     sum = sumCompute($scope.model)
     switch
       when sum == 0   then $scope.model[0].percent = 100
       when 0 < sum < 100 or sum > 100 then normalizeData($scope.model, sum)
 
-  loadData Data.dataSmall
-  do analizeData
+  findAcceptor = (type) ->
+    if type == "min"
+      acceptor = _.min(
+        $scope.model
+      ,
+        (item) ->
+          item.percent
+      )
+    else if type == "max"
+      acceptor = _.max(
+        $scope.model
+      ,
+        (item) ->
+          item.percent
+      )
+    acceptor
+
+  loadData Data.dataNorm
+  do analiseData
 
   $scope.dirtySum = sumCompute($scope.model)
 
-  $scope.balance = () ->
-    donor = do findDonor
-    $scope.dirtySum = sumCompute($scope.model)
-    $scope.diff = $scope.defSum - $scope.dirtySum
-#    console.log "donor ", donor
-    donor.setPercent($scope.diff)
-#    console.log "donor ", donor
+  $scope.set = (item, percent) ->
+    before = item.percent
+    console.log "before ", before
+    item.setPercent(percent)
+    after = item.percent
+    console.log "after ", after
+    console.log "compare ", after == before
+    if after > before
+      $scope.balance percent, "max"
+    else if after < before
+      $scope.balance percent, "min"
+    return
+
+  $scope.balance = (percent, type) ->
+    acceptor = findAcceptor type
+    console.log "acceptor", acceptor
+    $scope.dirtySum = sumCompute($scope.model) #TODO Play with this value
+    $scope.diff = $scope.defSum - sumCompute($scope.model)# - percent
+    acceptor.setPercent($scope.diff, "append")
     $scope.dirtySum = sumCompute($scope.model)
     return
 
   $scope.dec = (item) ->
-    item.decPercent(1)
-    do $scope.balance
+    unless item == findAcceptor "min"
+      $scope.set(item, -1)
 
   $scope.inc = (item) ->
-    item.incPercent(1)
-    do $scope.balance
-
-  $scope.set = (item, percent = 1) ->
-    console.log item, percent
-    item.setPercent(percent)
-    do $scope.balance
+    unless $scope.dirtySum == 100 # TODO change this range
+      $scope.set(item, 1)
 
   return
