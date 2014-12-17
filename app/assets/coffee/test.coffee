@@ -21,26 +21,28 @@ app.directive "commaDetect", ($log) ->
     restrict: "A"
     require: "ngModel"
     link: (scope, element, attr, ctrl) ->
-      ###
-        try to use scope.$watch and $parsers
-        http://jsfiddle.net/ZvdXp/6/
-      ###
-      scope.$watch('item.percent', (newV, oldV) ->
-        ctrl.$parsers.unshift((value) ->
-          console.log value
-        )
-      )
-#      return unless ctrl?
-#      ctrl.$parsers.push( (value) ->
-#        return 11111111111
-#        return "" if typeof value == "undefined"
-#        tValue = value.replace(/,/g,'.');
-#
-#        if (tValue != value)
-#          ctrl.$setViewValue(tValue);
-#          ctrl.$render();
-#        return tValue;
-#      )
+      return unless ctrl?
+      oldV = null
+
+      check = (value) ->
+        return unless value?
+        if value.match(/\.$/)
+          oldV = parseInt(value)
+        else
+          oldV = null
+
+        tVal = value.replace(/,/g,".")
+
+        if tVal != value
+          ctrl.$setViewValue tVal
+          ctrl.$render()
+
+        if oldV?
+          return oldV
+        else
+          return tVal
+
+      ctrl.$parsers.push check
   }
 
 # MainCtrl

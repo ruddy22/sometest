@@ -32,16 +32,33 @@ app.directive("commaDetect", function($log) {
     restrict: "A",
     require: "ngModel",
     link: function(scope, element, attr, ctrl) {
-
-      /*
-        try to use scope.$watch and $parsers
-        http://jsfiddle.net/ZvdXp/6/
-       */
-      return scope.$watch('item.percent', function(newV, oldV) {
-        return ctrl.$parsers.unshift(function(value) {
-          return console.log(value);
-        });
-      });
+      var check, oldV;
+      if (ctrl == null) {
+        return;
+      }
+      oldV = null;
+      check = function(value) {
+        var tVal;
+        if (value == null) {
+          return;
+        }
+        if (value.match(/\.$/)) {
+          oldV = parseInt(value);
+        } else {
+          oldV = null;
+        }
+        tVal = value.replace(/,/g, ".");
+        if (tVal !== value) {
+          ctrl.$setViewValue(tVal);
+          ctrl.$render();
+        }
+        if (oldV != null) {
+          return oldV;
+        } else {
+          return tVal;
+        }
+      };
+      return ctrl.$parsers.push(check);
     }
   };
 });

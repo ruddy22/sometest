@@ -10,7 +10,7 @@
       <div ng-controller="MainCtrl">
         <div ng-repeat="item in model">
           <label ng-bind="item.name" for="item.name"></label>
-          <input ng-model="item.percent" type="number" min="0" max="100" id="item.name" step="any" comma-detect>
+          <input ng-model="item.percent" type="text" min="0" max="100" id="item.name" step="any" comma-detect="comma-detect">
           <input ng-model="item.percent" type="range" min="0" max="100" range-parser>
         </div><br>
         <div>Result
