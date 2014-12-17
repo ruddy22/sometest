@@ -27,7 +27,9 @@ app.directive("rangeParser", function() {
   };
 });
 
-app.directive("commaDetect", function($log) {
+app.constant("defaultSum", 100);
+
+app.directive("commaDetect", function() {
   return {
     restrict: "A",
     require: "ngModel",
@@ -70,10 +72,11 @@ app.directive("commaDetect", function($log) {
   };
 });
 
-app.controller("MainCtrl", function($scope, $window) {
-  var data, findDelta, i, item, modItem, sumCompute, watchIniter, zeroCompute, zeroCounter, _i, _j, _len, _len1, _ref, _ref1;
+app.controller("MainCtrl", function($scope, $window, defaultSum) {
+  var data, findDonor, i, modItem, sumCompute, zeroCompute, zeroCounter, _i, _len, _ref;
   $scope.model = [];
   $scope.diff = null;
+  $scope.defSum = defaultSum;
   $window.model = $scope.model;
   sumCompute = function(items) {
     var sum;
@@ -82,27 +85,29 @@ app.controller("MainCtrl", function($scope, $window) {
     }, 0);
     return sum;
   };
-  watchIniter = function(item) {
-    return $scope.$watch(function() {
-      return item;
-    }, function(newV, oldV) {
-      console.log("init");
-      console.log("nV", newV);
-      return console.log("oV", oldV);
-    }, true);
-  };
-  findDelta = function(grt, lss) {
-    return grt - lss;
+  findDonor = function() {
+    var donor;
+    donor = _.min($scope.model, function(item) {
+      return item.percent;
+    });
+    return donor;
   };
   modItem = function(item) {
+    item["blocked"] = false;
     item["getPercent"] = function() {
       return this.percent;
     };
+    item["setPercent"] = function(points) {
+      this.percent = parseFloat(points);
+      return this.percent;
+    };
     item["incPercent"] = function(points) {
-      return this.percent + points;
+      this.percent += parseFloat(points);
+      return this.percent;
     };
     item["decPercent"] = function(points) {
-      return this.percent - points;
+      this.percent -= parseFloat(points);
+      return this.percent;
     };
     return item;
   };
@@ -136,16 +141,28 @@ app.controller("MainCtrl", function($scope, $window) {
   if (zeroCounter === 0) {
     $scope.model[0].percent = 100;
   }
-  _ref1 = $scope.model;
-  for (_j = 0, _len1 = _ref1.length; _j < _len1; _j++) {
-    item = _ref1[_j];
-    watchIniter(item);
-  }
+  $scope.dirtySum = sumCompute($scope.model);
+  $scope.balance = function() {
+    var donor;
+    donor = findDonor();
+    $scope.dirtySum = sumCompute($scope.model);
+    $scope.diff = $scope.defSum - $scope.dirtySum;
+    console.log("donor ", donor);
+    donor.setPercent($scope.diff);
+    console.log("donor ", donor);
+    $scope.dirtySum = sumCompute($scope.model);
+  };
   $scope.dec = function(item) {
-    return item.decPercent(1);
+    item.decPercent(1);
+    return $scope.balance();
   };
   $scope.inc = function(item) {
-    return item.incPercent(1);
+    item.incPercent(1);
+    return $scope.balance();
+  };
+  $scope.set = function(item, percent) {
+    item.setPercent(percent);
+    return $scope.balance();
   };
 });
 

@@ -10,10 +10,10 @@
       <div ng-controller="MainCtrl" ng-cloak>
         <div ng-repeat="item in model">
           <label ng-bind="item.name" for="item.name"></label><span ng-click="dec(item)"><</span>
-          <input ng-model="item.percent" type="text" min="0" max="100" id="item.name" step="any" comma-detect="comma-detect"><span ng-click="inc(item)">></span>
-          <input ng-model="item.percent" type="range" min="0" max="100" range-parser="range-parser">
+          <input ng-model="item.percent" type="text" min="0" max="100" id="item.name" step="any" comma-detect="comma-detect" ng-blur="set(item, item.percent)"><span ng-click="inc(item)">></span>
+          <input ng-model="item.percent" type="range" min="0" max="100" range-parser="range-parser" ng-change="balance()">
         </div><br>
-        <div>Result
+        <div>Result<br><span>dirtySum: {{ dirtySum }}</span><br><span>defSum: {{ defSum }}</span><br><span>diff: {{ diff }}</span>
           <div ng-repeat="item in model"><span>nodeName: {{ item.name }}, nodeLoad: {{ item.percent }}</span></div>
         </div>
       </div>

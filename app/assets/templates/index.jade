@@ -11,11 +11,17 @@ html
         div(ng-repeat="item in model")
           label(ng-bind="item.name" for="item.name")
           span(ng-click="dec(item)") <
-          input(ng-model="item.percent" type="text" min=0 max=100 id="item.name" step="any" comma-detect="comma-detect")
+          input(ng-model="item.percent" type="text" min=0 max=100 id="item.name" step="any" comma-detect="comma-detect" ng-blur="set(item, item.percent)")
           span(ng-click="inc(item)") >
-          input(ng-model="item.percent" type="range" min=0 max=100 range-parser="range-parser")
+          input(ng-model="item.percent" type="range" min=0 max=100 range-parser="range-parser" ng-change="balance()")
         br
         div Result
+          br
+          span dirtySum: {{ dirtySum }}
+          br
+          span defSum: {{ defSum }}
+          br
+          span diff: {{ diff }}
           div(ng-repeat="item in model")
             span nodeName: {{ item.name }}, nodeLoad: {{ item.percent }}
 

@@ -16,9 +16,10 @@ app.directive "rangeParser", () ->
       )
   }
 
+app.constant "defaultSum", 100
+
 # TODO show float precision (toFixed or something else)
-# TODO use on blur
-app.directive "commaDetect", ($log) ->
+app.directive "commaDetect", () ->
   return {
     restrict: "A"
     require: "ngModel"
@@ -52,43 +53,48 @@ app.directive "commaDetect", ($log) ->
   }
 
 # MainCtrl
-app.controller "MainCtrl", ($scope, $window) ->
+# use common sum
+# use ng-change
+app.controller "MainCtrl", ($scope, $window, defaultSum) ->
   $scope.model = []
   $scope.diff = null
+  $scope.defSum = defaultSum
   $window.model = $scope.model
 
   sumCompute = (items) ->
-    sum = _.reduce( items,
-                    (memo, item)->
-                      return memo+item.percent
-                    , 0
-                  )
+    sum = _.reduce(
+      items
+    ,
+      (memo, item)->
+         memo+item.percent
+    ,
+      0
+    )
     sum
 
-
-  watchIniter = (item) ->
-    $scope.$watch(
-      () ->
-        item
+  findDonor = ->
+    donor = _.min(
+      $scope.model
     ,
-      (newV,oldV) ->
-        console.log "init"
-        console.log "nV", newV
-        console.log "oV", oldV
-    ,
-      true
+      (item) ->
+        item.percent
     )
+    donor
 
-  findDelta = (grt, lss) ->
-    return grt - lss
 
   modItem = (item) ->
+    item["blocked"] = false
     item["getPercent"] = ->
-      return @percent
+      @percent
+    item["setPercent"] = (points)->
+      @percent = parseFloat(points)
+      @percent
     item["incPercent"] = (points)->
-      return @percent+points
+      @percent += parseFloat(points)
+      @percent
     item["decPercent"] = (points)->
-      return @percent-points
+      @percent -= parseFloat(points)
+      @percent
     item
 
   data =
@@ -113,13 +119,28 @@ app.controller "MainCtrl", ($scope, $window) ->
 
   $scope.model[0].percent = 100 if zeroCounter == 0
 
-  for item in $scope.model
-    watchIniter(item)
+  $scope.dirtySum = sumCompute($scope.model)
+
+  $scope.balance = () ->
+    donor = do findDonor
+    $scope.dirtySum = sumCompute($scope.model)
+    $scope.diff = $scope.defSum - $scope.dirtySum
+    console.log "donor ", donor
+    donor.setPercent($scope.diff)
+    console.log "donor ", donor
+    $scope.dirtySum = sumCompute($scope.model)
+    return
 
   $scope.dec = (item) ->
     item.decPercent(1)
+    do $scope.balance
 
   $scope.inc = (item) ->
     item.incPercent(1)
+    do $scope.balance
+
+  $scope.set = (item, percent) ->
+    item.setPercent(percent)
+    do $scope.balance
 
   return
