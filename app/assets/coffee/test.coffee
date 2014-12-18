@@ -32,6 +32,7 @@ app.directive "commaDetect", () ->
         return unless value?
         return if parseInt(value) > 100
         return if value.match(/^\-/)
+        return if value.match(/[a-zA-Z]/)
         if value.match(/\.$/)
           oldV = parseInt(value)
         else
@@ -100,14 +101,102 @@ app.service "Data", ->
     ]
   @
 
+app.directive "balancer", () ->
+  return {
+    restrict: "A"
+    templateUrl: "template.html",
+    transclude: true
+    scope: { items: "=" }
+    controller: ($scope, defaultSum)->
+      $scope.indexOfChanged = null
+
+      $scope.findSum = ->
+        sum = _.reduce(
+          $scope.items
+        ,
+          (memo, item)->
+            memo+item.percent
+        ,
+          0
+        )
+        sum
+
+      $scope.findDiff = ->
+        sum = do $scope.findSum
+        diff = parseFloat defaultSum - sum
+        diff
+
+      $scope.removeChanged = (scpItems, index) ->
+        unless scpItems[index]
+          items = _.clone scpItems
+          items.splice index, 1
+
+      $scope.findAcceptor = (type) ->
+        items = $scope.removeChanged $scope.items, $scope.indexOfChanged
+
+        if type == "min"
+          acceptor = _.min(
+            items
+          ,
+            (item) ->
+              item.percent
+          )
+        else if type == "max"
+          acceptor = _.max(
+            items
+          ,
+            (item) ->
+              item.percent
+          )
+        acceptor
+
+      $scope.change = (index) ->
+        $scope.indexOfChanged = index
+
+      $scope.dec = () ->
+        console.log "dec"
+
+      $scope.inc = () ->
+        console.log "inc"
+#
+#      $scope.dirtySum = sumCompute($scope.model)
+#
+#      $scope.set = (item, percent) ->
+#        before = item.percent
+#        console.log "before ", before
+#        item.setPercent(percent)
+#        after = item.percent
+#        console.log "after ", after
+#        if after > before
+#          $scope.balance percent, "max"
+#        else if after < before
+#          $scope.balance percent, "min"
+#        return
+#
+#      $scope.balance = (percent, type) ->
+#        acceptor = findAcceptor type
+#        console.log "acceptor", acceptor
+#        $scope.dirtySum = sumCompute($scope.model) #TODO Play with this value
+#        $scope.diff = $scope.defSum - sumCompute($scope.model)# - percent
+#        acceptor.setPercent($scope.diff, "append")
+#        $scope.dirtySum = sumCompute($scope.model)
+#        return
+#
+#      $scope.dec = (item) ->
+#        unless item.percent == 0 or item == findAcceptor "min"
+#          $scope.set(item, -1)
+#
+#      $scope.inc = (item) ->
+#        unless item.percent == 100 or item == findAcceptor "max" # TODO change this range or use dirtysum
+#          $scope.set(item, 1)
+  }
 # MainCtrl
 # use common sum
 # use ng-change
 app.controller "MainCtrl", ($scope, $window, defaultSum, Data) ->
   $scope.model = []
-  $scope.diff = null
-  $scope.defSum = defaultSum
   $window.model = $scope.model
+  $scope.defSum = defaultSum
 
   sumCompute = (items) ->
     sum = _.reduce(
@@ -152,55 +241,7 @@ app.controller "MainCtrl", ($scope, $window, defaultSum, Data) ->
       when sum == 0   then $scope.model[0].percent = 100
       when 0 < sum < 100 or sum > 100 then normalizeData($scope.model, sum)
 
-  findAcceptor = (type) ->
-    if type == "min"
-      acceptor = _.min(
-        $scope.model
-      ,
-        (item) ->
-          item.percent
-      )
-    else if type == "max"
-      acceptor = _.max(
-        $scope.model
-      ,
-        (item) ->
-          item.percent
-      )
-    acceptor
-
   loadData Data.dataNorm
   do analiseData
-
-  $scope.dirtySum = sumCompute($scope.model)
-
-  $scope.set = (item, percent) ->
-    before = item.percent
-    console.log "before ", before
-    item.setPercent(percent)
-    after = item.percent
-    console.log "after ", after
-    if after > before
-      $scope.balance percent, "max"
-    else if after < before
-      $scope.balance percent, "min"
-    return
-
-  $scope.balance = (percent, type) ->
-    acceptor = findAcceptor type
-    console.log "acceptor", acceptor
-    $scope.dirtySum = sumCompute($scope.model) #TODO Play with this value
-    $scope.diff = $scope.defSum - sumCompute($scope.model)# - percent
-    acceptor.setPercent($scope.diff, "append")
-    $scope.dirtySum = sumCompute($scope.model)
-    return
-
-  $scope.dec = (item) ->
-    unless item.percent == 0 or item == findAcceptor "min"
-      $scope.set(item, -1)
-
-  $scope.inc = (item) ->
-    unless item.percent == 100 or item == findAcceptor "max" # TODO change this range or use dirtysum
-      $scope.set(item, 1)
 
   return

@@ -50,6 +50,9 @@ app.directive("commaDetect", function() {
         if (value.match(/^\-/)) {
           return;
         }
+        if (value.match(/[a-zA-Z]/)) {
+          return;
+        }
         if (value.match(/\.$/)) {
           oldV = parseInt(value);
         } else {
@@ -132,12 +135,68 @@ app.service("Data", function() {
   return this;
 });
 
+app.directive("balancer", function() {
+  return {
+    restrict: "A",
+    templateUrl: "template.html",
+    transclude: true,
+    scope: {
+      items: "="
+    },
+    controller: function($scope, defaultSum) {
+      $scope.indexOfChanged = null;
+      $scope.findSum = function() {
+        var sum;
+        sum = _.reduce($scope.items, function(memo, item) {
+          return memo + item.percent;
+        }, 0);
+        return sum;
+      };
+      $scope.findDiff = function() {
+        var diff, sum;
+        sum = $scope.findSum();
+        diff = parseFloat(defaultSum - sum);
+        return diff;
+      };
+      $scope.removeChanged = function(scpItems, index) {
+        var items;
+        if (!scpItems[index]) {
+          items = _.clone(scpItems);
+          return items.splice(index, 1);
+        }
+      };
+      $scope.findAcceptor = function(type) {
+        var acceptor, items;
+        items = $scope.removeChanged($scope.items, $scope.indexOfChanged);
+        if (type === "min") {
+          acceptor = _.min(items, function(item) {
+            return item.percent;
+          });
+        } else if (type === "max") {
+          acceptor = _.max(items, function(item) {
+            return item.percent;
+          });
+        }
+        return acceptor;
+      };
+      $scope.change = function(index) {
+        return $scope.indexOfChanged = index;
+      };
+      $scope.dec = function() {
+        return console.log("dec");
+      };
+      return $scope.inc = function() {
+        return console.log("inc");
+      };
+    }
+  };
+});
+
 app.controller("MainCtrl", function($scope, $window, defaultSum, Data) {
-  var analiseData, findAcceptor, loadData, modItem, normalizeData, resolveProportion, sumCompute;
+  var analiseData, loadData, modItem, normalizeData, resolveProportion, sumCompute;
   $scope.model = [];
-  $scope.diff = null;
-  $scope.defSum = defaultSum;
   $window.model = $scope.model;
+  $scope.defSum = defaultSum;
   sumCompute = function(items) {
     var sum;
     sum = _.reduce(items, function(memo, item) {
@@ -191,54 +250,8 @@ app.controller("MainCtrl", function($scope, $window, defaultSum, Data) {
         return normalizeData($scope.model, sum);
     }
   };
-  findAcceptor = function(type) {
-    var acceptor;
-    if (type === "min") {
-      acceptor = _.min($scope.model, function(item) {
-        return item.percent;
-      });
-    } else if (type === "max") {
-      acceptor = _.max($scope.model, function(item) {
-        return item.percent;
-      });
-    }
-    return acceptor;
-  };
   loadData(Data.dataNorm);
   analiseData();
-  $scope.dirtySum = sumCompute($scope.model);
-  $scope.set = function(item, percent) {
-    var after, before;
-    before = item.percent;
-    console.log("before ", before);
-    item.setPercent(percent);
-    after = item.percent;
-    console.log("after ", after);
-    if (after > before) {
-      $scope.balance(percent, "max");
-    } else if (after < before) {
-      $scope.balance(percent, "min");
-    }
-  };
-  $scope.balance = function(percent, type) {
-    var acceptor;
-    acceptor = findAcceptor(type);
-    console.log("acceptor", acceptor);
-    $scope.dirtySum = sumCompute($scope.model);
-    $scope.diff = $scope.defSum - sumCompute($scope.model);
-    acceptor.setPercent($scope.diff, "append");
-    $scope.dirtySum = sumCompute($scope.model);
-  };
-  $scope.dec = function(item) {
-    if (!(item.percent === 0 || item === findAcceptor("min"))) {
-      return $scope.set(item, -1);
-    }
-  };
-  $scope.inc = function(item) {
-    if (!(item.percent === 100 || item === findAcceptor("max"))) {
-      return $scope.set(item, 1);
-    }
-  };
 });
 
 //# sourceMappingURL=maps/test.js.map
