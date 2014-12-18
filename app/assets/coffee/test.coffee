@@ -180,7 +180,6 @@ app.controller "MainCtrl", ($scope, $window, defaultSum, Data) ->
     item.setPercent(percent)
     after = item.percent
     console.log "after ", after
-    console.log "compare ", after == before
     if after > before
       $scope.balance percent, "max"
     else if after < before
@@ -197,11 +196,11 @@ app.controller "MainCtrl", ($scope, $window, defaultSum, Data) ->
     return
 
   $scope.dec = (item) ->
-    unless item == findAcceptor "min"
+    unless item.percent == 0 or item == findAcceptor "min"
       $scope.set(item, -1)
 
   $scope.inc = (item) ->
-    unless $scope.dirtySum == 100 # TODO change this range
+    unless item.percent == 100 or item == findAcceptor "max" # TODO change this range or use dirtysum
       $scope.set(item, 1)
 
   return

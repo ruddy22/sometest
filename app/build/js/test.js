@@ -214,7 +214,6 @@ app.controller("MainCtrl", function($scope, $window, defaultSum, Data) {
     item.setPercent(percent);
     after = item.percent;
     console.log("after ", after);
-    console.log("compare ", after === before);
     if (after > before) {
       $scope.balance(percent, "max");
     } else if (after < before) {
@@ -231,12 +230,12 @@ app.controller("MainCtrl", function($scope, $window, defaultSum, Data) {
     $scope.dirtySum = sumCompute($scope.model);
   };
   $scope.dec = function(item) {
-    if (item !== findAcceptor("min")) {
+    if (!(item.percent === 0 || item === findAcceptor("min"))) {
       return $scope.set(item, -1);
     }
   };
   $scope.inc = function(item) {
-    if ($scope.dirtySum !== 100) {
+    if (!(item.percent === 100 || item === findAcceptor("max"))) {
       return $scope.set(item, 1);
     }
   };
