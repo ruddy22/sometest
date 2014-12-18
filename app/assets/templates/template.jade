@@ -1,7 +1,7 @@
 div(ng-repeat="item in items")
    label(ng-bind="item.name" for="item.name")
    span(ng-click="dec(item)" ng-disabled="item.blocked") <
-   input(ng-model="item.percent" type="text" min=0 max=100 id="item.name" comma-detect="comma-detect" ng-blur="set(item, item.percent)" ng-disabled="item.blocked")
+   input(ng-model="item.percent" type="text" min=0 max=100 id="item.name" comma-detect="comma-detect" ng-change="change($index)" ng-disabled="item.blocked")
    span(ng-click="inc(item)" ng-disabled="item.blocked") >
-   input(ng-model="item.percent" type="range" min=0 max=100 range-parser="range-parser" ng-disabled="item.blocked")
+   input(ng-model="item.percent" type="range" min=0 max=100 range-parser="range-parser" ng-change="change($index)" ng-disabled="item.blocked")
    input(ng-model="item.blocked" type="checkbox")

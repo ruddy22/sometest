@@ -153,11 +153,54 @@ app.directive "balancer", () ->
       $scope.change = (index) ->
         $scope.indexOfChanged = index
 
+      $scope.increasePercent = (item, acceptro, diffVal) ->
+        if item.name == acceptor.name
+          item.percent += diffVal
+
+          if item.percent > 100
+            item.percent = 100
+            do $scope.balance
+
+      $scope.decreasePercent = (item, acceptor, diffVal) ->
+        if item.name == acceptor.name
+          item.percent -= diffVal
+
+          if item.percent < 0
+            item.percent = 0
+            do $scope.balance
+
+      $scope.balance = ->
+        items = _.clone $scope.items
+        length = items.length
+        diffVal = do $scope.findDiff
+
+        if length > 1
+          if diffVal > 0
+            acceptor = $scope.findAcceptor("max")
+            ($scope.increasePercent item, acceptor, diffVal) for item in items
+
+          if diffVal < 0
+            acceptor = $scope.findAcceptor("min")
+            ($scope.decreasePercent item, acceptor, diffVal) for item in items
+
+        $scope.items = _.clone items
+
       $scope.dec = () ->
         console.log "dec"
 
       $scope.inc = () ->
         console.log "inc"
+
+      $scope.$watch(
+        ->
+          $scope.items
+      ,
+        ->
+          console.log "init"
+          do $scope.balance
+      ,
+        true
+      )
 #
 #      $scope.dirtySum = sumCompute($scope.model)
 #
@@ -173,14 +216,6 @@ app.directive "balancer", () ->
 #          $scope.balance percent, "min"
 #        return
 #
-#      $scope.balance = (percent, type) ->
-#        acceptor = findAcceptor type
-#        console.log "acceptor", acceptor
-#        $scope.dirtySum = sumCompute($scope.model) #TODO Play with this value
-#        $scope.diff = $scope.defSum - sumCompute($scope.model)# - percent
-#        acceptor.setPercent($scope.diff, "append")
-#        $scope.dirtySum = sumCompute($scope.model)
-#        return
 #
 #      $scope.dec = (item) ->
 #        unless item.percent == 0 or item == findAcceptor "min"

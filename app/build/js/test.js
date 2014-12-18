@@ -182,12 +182,59 @@ app.directive("balancer", function() {
       $scope.change = function(index) {
         return $scope.indexOfChanged = index;
       };
+      $scope.increasePercent = function(item, acceptro, diffVal) {
+        if (item.name === acceptor.name) {
+          item.percent += diffVal;
+          if (item.percent > 100) {
+            item.percent = 100;
+            return $scope.balance();
+          }
+        }
+      };
+      $scope.decreasePercent = function(item, acceptor, diffVal) {
+        if (item.name === acceptor.name) {
+          item.percent -= diffVal;
+          if (item.percent < 0) {
+            item.percent = 0;
+            return $scope.balance();
+          }
+        }
+      };
+      $scope.balance = function() {
+        var acceptor, diffVal, item, items, length, _i, _j, _len, _len1;
+        items = _.clone($scope.items);
+        length = items.length;
+        diffVal = $scope.findDiff();
+        if (length > 1) {
+          if (diffVal > 0) {
+            acceptor = $scope.findAcceptor("max");
+            for (_i = 0, _len = items.length; _i < _len; _i++) {
+              item = items[_i];
+              $scope.increasePercent(item, acceptor, diffVal);
+            }
+          }
+          if (diffVal < 0) {
+            acceptor = $scope.findAcceptor("min");
+            for (_j = 0, _len1 = items.length; _j < _len1; _j++) {
+              item = items[_j];
+              $scope.decreasePercent(item, acceptor, diffVal);
+            }
+          }
+        }
+        return $scope.items = _.clone(items);
+      };
       $scope.dec = function() {
         return console.log("dec");
       };
-      return $scope.inc = function() {
+      $scope.inc = function() {
         return console.log("inc");
       };
+      return $scope.$watch(function() {
+        return $scope.items;
+      }, function() {
+        console.log("init");
+        return $scope.balance();
+      }, true);
     }
   };
 });
