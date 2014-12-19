@@ -2,6 +2,8 @@ doctype
 html
   head
     title testTask
+    link(rel="stylesheet" href="./js/vendor/normalize.css/normalize.css")
+    link(rel="stylesheet" href="./style.css")
 
   body
     h1 E:mg
@@ -9,12 +11,12 @@ html
     div(ng-app="testApp")
       div
       div(ng-controller="MainCtrl" ng-cloak)
-        div(ng-click="setDataNull()") dataNull
-        div(ng-click="setDataNorm()") dataNorm
-        div(ng-click="setDataBig()") dataBig
-        div(ng-click="setDataSmall()") dataSmall
-        div(ng-click="setDataOnce()") dataOnce
-        div(ng-click="setDataTwice()") dataTwice
+        div(class="click-me" ng-click="setDataNull()") dataNull
+        div(class="click-me" ng-click="setDataNorm()") dataNorm
+        div(class="click-me" ng-click="setDataBig()") dataBig
+        div(class="click-me" ng-click="setDataSmall()") dataSmall
+        div(class="click-me" ng-click="setDataOnce()") dataOnce
+        div(class="click-me" ng-click="setDataTwice()") dataTwice
         div(balancer items="model")
 
         br

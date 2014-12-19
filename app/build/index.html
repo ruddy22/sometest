@@ -2,6 +2,8 @@
 <html>
   <head>
     <title>testTask</title>
+    <link rel="stylesheet" href="./js/vendor/normalize.css/normalize.css">
+    <link rel="stylesheet" href="./style.css">
   </head>
   <body>
     <h1>E:mg</h1>
@@ -9,12 +11,12 @@
     <div ng-app="testApp">
       <div></div>
       <div ng-controller="MainCtrl" ng-cloak>
-        <div ng-click="setDataNull()">dataNull</div>
-        <div ng-click="setDataNorm()">dataNorm</div>
-        <div ng-click="setDataBig()">dataBig</div>
-        <div ng-click="setDataSmall()">dataSmall</div>
-        <div ng-click="setDataOnce()">dataOnce</div>
-        <div ng-click="setDataTwice()">dataTwice</div>
+        <div ng-click="setDataNull()" class="click-me">dataNull</div>
+        <div ng-click="setDataNorm()" class="click-me">dataNorm</div>
+        <div ng-click="setDataBig()" class="click-me">dataBig</div>
+        <div ng-click="setDataSmall()" class="click-me">dataSmall</div>
+        <div ng-click="setDataOnce()" class="click-me">dataOnce</div>
+        <div ng-click="setDataTwice()" class="click-me">dataTwice</div>
         <div balancer items="model"></div><br>
         <div>Result<br><span>defSum: {{ defSum }}</span><br>
           <div ng-repeat="item in model"><span>nodeName: {{ item.name }}, nodeLoad: {{ item.percent }}</span></div>
