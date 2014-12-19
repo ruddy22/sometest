@@ -87,6 +87,9 @@ app.service "Data", ->
     ,
       name: "item3"
       percent: 80
+    ,
+      name: "item4"
+      percent: 100
     ]
   @dataSmall =
     items: [
@@ -98,6 +101,19 @@ app.service "Data", ->
     ,
       name: "item3"
       percent: 30
+    ]
+  @dataOnce =
+    items: [
+      name: "item1"
+      percent: 140
+    ]
+  @dataTwice =
+    items: [
+      name: "item1"
+      percent: 140
+    ,
+      name: "item2"
+      percent: 90
     ]
   @
 
@@ -197,7 +213,7 @@ app.directive "balancer", () ->
         $scope.items = _.clone items
 
       $scope.findCurrentSum = (items) ->
-        sum = _._.reduce(
+        sum = _.reduce(
           items
         ,
           (memo, item)->
@@ -213,14 +229,26 @@ app.directive "balancer", () ->
       $scope.findMaxVal = () ->
         items = _.clone $scope.items
         items = $scope.removeDisabled items
-        maxVal = defaultSum - $scope.findCurrentSum items
+        unless items.length == $scope.items.length
+          maxVal = defaultSum - $scope.findCurrentSum items
+        else
+          maxVal = defaultSum
         maxVal
 
-      $scope.dec = () ->
-        console.log "dec"
+      $scope.checkCount = ->
+        scpILength = $scope.items.length
+        return true if scpILength == 1 or scpILength == 2
 
-      $scope.inc = () ->
-        console.log "inc"
+      $scope.checkChange = (index) ->
+        items = _.clone $scope.items
+        items = $scope.removeDisabled items
+        $scope.items[index].blocked = false if ($scope.items.length - items.length) > 2
+
+#      $scope.dec = (index) ->
+#        $scope.change index
+#
+#      $scope.inc = (index) ->
+#        $scope.change index
 
       $scope.$watch(
         ->
@@ -231,33 +259,8 @@ app.directive "balancer", () ->
       ,
         true
       )
-#
-#      $scope.dirtySum = sumCompute($scope.model)
-#
-#      $scope.set = (item, percent) ->
-#        before = item.percent
-#        console.log "before ", before
-#        item.setPercent(percent)
-#        after = item.percent
-#        console.log "after ", after
-#        if after > before
-#          $scope.balance percent, "max"
-#        else if after < before
-#          $scope.balance percent, "min"
-#        return
-#
-#
-#      $scope.dec = (item) ->
-#        unless item.percent == 0 or item == findAcceptor "min"
-#          $scope.set(item, -1)
-#
-#      $scope.inc = (item) ->
-#        unless item.percent == 100 or item == findAcceptor "max" # TODO change this range or use dirtysum
-#          $scope.set(item, 1)
   }
 # MainCtrl
-# use common sum
-# use ng-change
 app.controller "MainCtrl", ($scope, $window, defaultSum, Data) ->
   $scope.model = []
   $window.model = $scope.model
@@ -298,15 +301,32 @@ app.controller "MainCtrl", ($scope, $window, defaultSum, Data) ->
     )
 
   loadData = (dataType = Data.dataNull) ->
+    $scope.model = []
     $scope.model.push(modItem i) for i in dataType.items
 
   analiseData = ->
+    return if _.isEmpty $scope.model
+    length = $scope.model.length
     sum = sumCompute($scope.model)
     switch
-      when sum == 0   then $scope.model[0].percent = 100
+      when sum == 0 or length == 1    then $scope.model[0].percent = 100
       when 0 < sum < 100 or sum > 100 then normalizeData($scope.model, sum)
 
-  loadData Data.dataNorm
-  do analiseData
+  $scope.init = (dataType)->
+    loadData dataType
+    do analiseData
+
+  $scope.setDataNull = ->
+    $scope.init Data.dataNull
+  $scope.setDataNorm = ->
+    $scope.init Data.dataNorm
+  $scope.setDataBig = ->
+    $scope.init Data.dataBig
+  $scope.setDataSmall = ->
+    $scope.init Data.dataSmall
+  $scope.setDataOnce = ->
+    $scope.init Data.dataOnce
+  $scope.setDataTwice = ->
+    $scope.init Data.dataTwice
 
   return

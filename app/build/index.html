@@ -7,7 +7,14 @@
     <h1>E:mg</h1>
     <h2>testTask</h2>
     <div ng-app="testApp">
+      <div></div>
       <div ng-controller="MainCtrl" ng-cloak>
+        <div ng-click="setDataNull()">dataNull</div>
+        <div ng-click="setDataNorm()">dataNorm</div>
+        <div ng-click="setDataBig()">dataBig</div>
+        <div ng-click="setDataSmall()">dataSmall</div>
+        <div ng-click="setDataOnce()">dataOnce</div>
+        <div ng-click="setDataTwice()">dataTwice</div>
         <div balancer items="model"></div><br>
         <div>Result<br><span>defSum: {{ defSum }}</span><br>
           <div ng-repeat="item in model"><span>nodeName: {{ item.name }}, nodeLoad: {{ item.percent }}</span></div>

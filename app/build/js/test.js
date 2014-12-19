@@ -115,6 +115,9 @@ app.service("Data", function() {
       }, {
         name: "item3",
         percent: 80
+      }, {
+        name: "item4",
+        percent: 100
       }
     ]
   };
@@ -129,6 +132,25 @@ app.service("Data", function() {
       }, {
         name: "item3",
         percent: 30
+      }
+    ]
+  };
+  this.dataOnce = {
+    items: [
+      {
+        name: "item1",
+        percent: 140
+      }
+    ]
+  };
+  this.dataTwice = {
+    items: [
+      {
+        name: "item1",
+        percent: 140
+      }, {
+        name: "item2",
+        percent: 90
       }
     ]
   };
@@ -234,7 +256,7 @@ app.directive("balancer", function() {
       };
       $scope.findCurrentSum = function(items) {
         var sum;
-        sum = _._.reduce(items, function(memo, item) {
+        sum = _.reduce(items, function(memo, item) {
           return memo + item.percent;
         }, 0);
         return sum;
@@ -246,14 +268,27 @@ app.directive("balancer", function() {
         var items, maxVal;
         items = _.clone($scope.items);
         items = $scope.removeDisabled(items);
-        maxVal = defaultSum - $scope.findCurrentSum(items);
+        if (items.length !== $scope.items.length) {
+          maxVal = defaultSum - $scope.findCurrentSum(items);
+        } else {
+          maxVal = defaultSum;
+        }
         return maxVal;
       };
-      $scope.dec = function() {
-        return console.log("dec");
+      $scope.checkCount = function() {
+        var scpILength;
+        scpILength = $scope.items.length;
+        if (scpILength === 1 || scpILength === 2) {
+          return true;
+        }
       };
-      $scope.inc = function() {
-        return console.log("inc");
+      $scope.checkChange = function(index) {
+        var items;
+        items = _.clone($scope.items);
+        items = $scope.removeDisabled(items);
+        if (($scope.items.length - items.length) > 2) {
+          return $scope.items[index].blocked = false;
+        }
       };
       return $scope.$watch(function() {
         return $scope.items;
@@ -304,6 +339,7 @@ app.controller("MainCtrl", function($scope, $window, defaultSum, Data) {
     if (dataType == null) {
       dataType = Data.dataNull;
     }
+    $scope.model = [];
     _ref = dataType.items;
     _results = [];
     for (_i = 0, _len = _ref.length; _i < _len; _i++) {
@@ -313,17 +349,41 @@ app.controller("MainCtrl", function($scope, $window, defaultSum, Data) {
     return _results;
   };
   analiseData = function() {
-    var sum;
+    var length, sum;
+    if (_.isEmpty($scope.model)) {
+      return;
+    }
+    length = $scope.model.length;
     sum = sumCompute($scope.model);
     switch (false) {
-      case sum !== 0:
+      case !(sum === 0 || length === 1):
         return $scope.model[0].percent = 100;
       case !((0 < sum && sum < 100) || sum > 100):
         return normalizeData($scope.model, sum);
     }
   };
-  loadData(Data.dataNorm);
-  analiseData();
+  $scope.init = function(dataType) {
+    loadData(dataType);
+    return analiseData();
+  };
+  $scope.setDataNull = function() {
+    return $scope.init(Data.dataNull);
+  };
+  $scope.setDataNorm = function() {
+    return $scope.init(Data.dataNorm);
+  };
+  $scope.setDataBig = function() {
+    return $scope.init(Data.dataBig);
+  };
+  $scope.setDataSmall = function() {
+    return $scope.init(Data.dataSmall);
+  };
+  $scope.setDataOnce = function() {
+    return $scope.init(Data.dataOnce);
+  };
+  $scope.setDataTwice = function() {
+    return $scope.init(Data.dataTwice);
+  };
 });
 
 //# sourceMappingURL=maps/test.js.map

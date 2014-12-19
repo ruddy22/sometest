@@ -7,7 +7,14 @@ html
     h1 E:mg
     h2 testTask
     div(ng-app="testApp")
+      div
       div(ng-controller="MainCtrl" ng-cloak)
+        div(ng-click="setDataNull()") dataNull
+        div(ng-click="setDataNorm()") dataNorm
+        div(ng-click="setDataBig()") dataBig
+        div(ng-click="setDataSmall()") dataSmall
+        div(ng-click="setDataOnce()") dataOnce
+        div(ng-click="setDataTwice()") dataTwice
         div(balancer items="model")
 
         br
