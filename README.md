@@ -4,7 +4,7 @@ installation:
     - for bitbucket:
     git clone https://bitbucket.com/shikari/testtask
     - for github:
-    git clone https://github.com/ruddy22/testtask
+    git clone https://github.com/ruddy22/sometest
 1. Install some stuff (gulp and etc):
     - for mac os x:
     sudo npm install
