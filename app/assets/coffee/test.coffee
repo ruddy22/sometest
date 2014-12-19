@@ -127,12 +127,23 @@ app.directive "balancer", () ->
         diff
 
       $scope.removeChanged = (scpItems, index) ->
-        unless scpItems[index]
+        if scpItems[index]
           items = _.clone scpItems
           items.splice index, 1
+          items
+
+      $scope.removeDisabled = (items) ->
+        result = _.reject(
+          items
+        ,
+          (item) ->
+            item.blocked == true
+        )
+        result
 
       $scope.findAcceptor = (type) ->
         items = $scope.removeChanged $scope.items, $scope.indexOfChanged
+        items = $scope.removeDisabled items
 
         if type == "min"
           acceptor = _.min(
@@ -153,7 +164,7 @@ app.directive "balancer", () ->
       $scope.change = (index) ->
         $scope.indexOfChanged = index
 
-      $scope.increasePercent = (item, acceptro, diffVal) ->
+      $scope.increasePercent = (item, acceptor, diffVal) ->
         if item.name == acceptor.name
           item.percent += diffVal
 
@@ -163,7 +174,7 @@ app.directive "balancer", () ->
 
       $scope.decreasePercent = (item, acceptor, diffVal) ->
         if item.name == acceptor.name
-          item.percent -= diffVal
+          item.percent -= Math.abs diffVal
 
           if item.percent < 0
             item.percent = 0
@@ -176,14 +187,34 @@ app.directive "balancer", () ->
 
         if length > 1
           if diffVal > 0
-            acceptor = $scope.findAcceptor("max")
+            acceptor = $scope.findAcceptor("min")
             ($scope.increasePercent item, acceptor, diffVal) for item in items
 
           if diffVal < 0
-            acceptor = $scope.findAcceptor("min")
+            acceptor = $scope.findAcceptor("max")
             ($scope.decreasePercent item, acceptor, diffVal) for item in items
 
         $scope.items = _.clone items
+
+      $scope.findCurrentSum = (items) ->
+        sum = _._.reduce(
+          items
+        ,
+          (memo, item)->
+            memo+item.percent
+        ,
+          0
+        )
+        sum
+
+      $scope.findMinVal = () ->
+        return 0
+
+      $scope.findMaxVal = () ->
+        items = _.clone $scope.items
+        items = $scope.removeDisabled items
+        maxVal = defaultSum - $scope.findCurrentSum items
+        maxVal
 
       $scope.dec = () ->
         console.log "dec"
@@ -196,7 +227,6 @@ app.directive "balancer", () ->
           $scope.items
       ,
         ->
-          console.log "init"
           do $scope.balance
       ,
         true

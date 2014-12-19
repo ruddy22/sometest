@@ -160,14 +160,23 @@ app.directive("balancer", function() {
       };
       $scope.removeChanged = function(scpItems, index) {
         var items;
-        if (!scpItems[index]) {
+        if (scpItems[index]) {
           items = _.clone(scpItems);
-          return items.splice(index, 1);
+          items.splice(index, 1);
+          return items;
         }
+      };
+      $scope.removeDisabled = function(items) {
+        var result;
+        result = _.reject(items, function(item) {
+          return item.blocked === true;
+        });
+        return result;
       };
       $scope.findAcceptor = function(type) {
         var acceptor, items;
         items = $scope.removeChanged($scope.items, $scope.indexOfChanged);
+        items = $scope.removeDisabled(items);
         if (type === "min") {
           acceptor = _.min(items, function(item) {
             return item.percent;
@@ -182,7 +191,7 @@ app.directive("balancer", function() {
       $scope.change = function(index) {
         return $scope.indexOfChanged = index;
       };
-      $scope.increasePercent = function(item, acceptro, diffVal) {
+      $scope.increasePercent = function(item, acceptor, diffVal) {
         if (item.name === acceptor.name) {
           item.percent += diffVal;
           if (item.percent > 100) {
@@ -193,7 +202,7 @@ app.directive("balancer", function() {
       };
       $scope.decreasePercent = function(item, acceptor, diffVal) {
         if (item.name === acceptor.name) {
-          item.percent -= diffVal;
+          item.percent -= Math.abs(diffVal);
           if (item.percent < 0) {
             item.percent = 0;
             return $scope.balance();
@@ -207,14 +216,14 @@ app.directive("balancer", function() {
         diffVal = $scope.findDiff();
         if (length > 1) {
           if (diffVal > 0) {
-            acceptor = $scope.findAcceptor("max");
+            acceptor = $scope.findAcceptor("min");
             for (_i = 0, _len = items.length; _i < _len; _i++) {
               item = items[_i];
               $scope.increasePercent(item, acceptor, diffVal);
             }
           }
           if (diffVal < 0) {
-            acceptor = $scope.findAcceptor("min");
+            acceptor = $scope.findAcceptor("max");
             for (_j = 0, _len1 = items.length; _j < _len1; _j++) {
               item = items[_j];
               $scope.decreasePercent(item, acceptor, diffVal);
@@ -222,6 +231,23 @@ app.directive("balancer", function() {
           }
         }
         return $scope.items = _.clone(items);
+      };
+      $scope.findCurrentSum = function(items) {
+        var sum;
+        sum = _._.reduce(items, function(memo, item) {
+          return memo + item.percent;
+        }, 0);
+        return sum;
+      };
+      $scope.findMinVal = function() {
+        return 0;
+      };
+      $scope.findMaxVal = function() {
+        var items, maxVal;
+        items = _.clone($scope.items);
+        items = $scope.removeDisabled(items);
+        maxVal = defaultSum - $scope.findCurrentSum(items);
+        return maxVal;
       };
       $scope.dec = function() {
         return console.log("dec");
@@ -232,7 +258,6 @@ app.directive("balancer", function() {
       return $scope.$watch(function() {
         return $scope.items;
       }, function() {
-        console.log("init");
         return $scope.balance();
       }, true);
     }

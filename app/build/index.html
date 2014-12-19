@@ -4,12 +4,12 @@
     <title>testTask</title>
   </head>
   <body>
-    <h1>hello</h1>
-    <h1>World</h1>
+    <h1>E:mg</h1>
+    <h2>testTask</h2>
     <div ng-app="testApp">
       <div ng-controller="MainCtrl" ng-cloak>
         <div balancer items="model"></div><br>
-        <div>Result<br><span>dirtySum: {{ dirtySum }}</span><br><span>defSum: {{ defSum }}</span><br><span>diff: {{ diff }}</span>
+        <div>Result<br><span>defSum: {{ defSum }}</span><br>
           <div ng-repeat="item in model"><span>nodeName: {{ item.name }}, nodeLoad: {{ item.percent }}</span></div>
         </div>
       </div>

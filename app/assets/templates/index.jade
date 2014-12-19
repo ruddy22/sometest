@@ -4,8 +4,8 @@ html
     title testTask
 
   body
-    h1 hello
-    h1 World
+    h1 E:mg
+    h2 testTask
     div(ng-app="testApp")
       div(ng-controller="MainCtrl" ng-cloak)
         div(balancer items="model")
@@ -13,11 +13,8 @@ html
         br
         div Result
           br
-          span dirtySum: {{ dirtySum }}
-          br
           span defSum: {{ defSum }}
           br
-          span diff: {{ diff }}
           div(ng-repeat="item in model")
             span nodeName: {{ item.name }}, nodeLoad: {{ item.percent }}
 
