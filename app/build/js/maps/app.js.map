@@ -1,0 +1,1 @@
+{"version":3,"sources":["app.coffee"],"names":[],"mappings":"AAAA,IAAA,GAAA;;AAAA,GAAA,GAAM,OAAO,CAAC,MAAR,CAAe,SAAf,EAA0B,EAA1B,CAAN,CAAA;;AAAA,GAEG,CAAC,QAAJ,CAAa,YAAb,EAA2B,GAA3B,CAFA,CAAA","file":"app.js","sourceRoot":"/source/","sourcesContent":["app = angular.module \"testApp\", []\n\napp.constant \"defaultSum\", 100\n\n# MainCtrl\n"]}

@@ -1,5 +1,5 @@
 div(ng-repeat="item in items")
-   input(ng-model="item.blocked" type="checkbox" ng-disabled="checkCount()" ng-change="checkChange($index)")
+   input(ng-model="item.blocked" type="checkbox")
    label(ng-bind="item.name" for="item.name")
-   input(ng-model="item.percent" type="range" min="{{ findMinVal() }}" max="{{ findMaxVal() }}" range-parser="range-parser" ng-change="change($index)" ng-disabled="item.blocked")
-   input(ng-model="item.percent" type="text" min="{{ findMinVal() }}" max="{{ findMaxVal() }}" id="item.name" comma-detect="comma-detect" ng-change="change($index)" ng-disabled="item.blocked")
+   input(ng-model="item.percent" type="range" min="{{ findMinVal() }}" max="{{ findMaxVal() }}" step=".01" range-parser="range-parser" ng-change="balance($index)" ng-disabled="item.blocked")
+   input(ng-model="item.percent" type="number" min="{{ findMinVal() }}" max="{{ findMaxVal() }}" id="item.name" integer="integer" ng-change="balance($index)" ng-disabled="item.blocked")

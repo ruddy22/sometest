@@ -1,4 +1,8 @@
-.click-me {
-    cursor: pointer;
-    border-bottom: dashed 1px;
+body{
+    width: 940px;
+    margin: auto;
+}
+
+.center {
+    margin: auto;
 }

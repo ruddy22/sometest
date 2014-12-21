@@ -3,7 +3,8 @@
   <head>
     <title>testTask</title>
     <link rel="stylesheet" href="./js/vendor/normalize.css/normalize.css">
-    <link rel="stylesheet" href="./style.css">
+    <link rel="stylesheet" href="./js/vendor/bootstrap/dist/css/bootstrap.min.css">
+    <link rel="stylesheet" href="style.css">
   </head>
   <body>
     <h1>E:mg</h1>
@@ -11,20 +12,34 @@
     <div ng-app="testApp">
       <div></div>
       <div ng-controller="MainCtrl" ng-cloak>
-        <div ng-click="setDataNull()" class="click-me">dataNull</div>
-        <div ng-click="setDataNorm()" class="click-me">dataNorm</div>
-        <div ng-click="setDataBig()" class="click-me">dataBig</div>
-        <div ng-click="setDataSmall()" class="click-me">dataSmall</div>
-        <div ng-click="setDataOnce()" class="click-me">dataOnce</div>
-        <div ng-click="setDataTwice()" class="click-me">dataTwice</div>
+        <div class="row center">
+          <div ng-click="setDataNull()" class="btn btn-info">dataNull</div>
+          <div ng-click="setDataNorm()" class="btn btn-info">dataNorm</div>
+          <div ng-click="setDataBig()" class="btn btn-info">dataBig</div>
+          <div ng-click="setDataSmall()" class="btn btn-info">dataSmall</div>
+          <div ng-click="setDataOnce()" class="btn btn-info">dataOnce</div>
+          <div ng-click="setDataTwice()" class="btn btn-info">dataTwice</div>
+        </div>
         <div balancer items="model"></div><br>
-        <div>Result<br><span>defSum: {{ defSum }}</span><br>
-          <div ng-repeat="item in model"><span>nodeName: {{ item.name }}, nodeLoad: {{ item.percent }}</span></div>
+        <div class="well">
+          <div class="container">
+            <div class="row">
+              <div class="col-xs-4">Result
+                <div ng-repeat="item in model"><span>{{ item.name }}: {{ item.percent | number:2}}</span></div>
+              </div>
+              <div class="col-xs-4">data before modification
+                <div ng-repeat="item in currentData"><span>{{ item }}</span></div>
+              </div>
+            </div>
+          </div>
         </div>
       </div>
     </div>
     <script src="./js/vendor/angular/angular.js"></script>
     <script src="./js/vendor/underscore/underscore.js"></script>
-    <script src="./js/test.js"></script>
+    <script src="./js/app.js"></script>
+    <script src="./js/controllers.js"></script>
+    <script src="./js/services.js"></script>
+    <script src="./js/directives.js"></script>
   </body>
 </html>

@@ -17,5 +17,5 @@ installation:
 usage:
 ======
 1. run:
-    for mac os: gulp
-    for linux: ./gulp
+    - for mac os: gulp
+    - for linux: ./gulp
