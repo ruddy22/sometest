@@ -56,9 +56,9 @@ app.directive("balancer", function() {
         });
         return min;
       };
-      $scope.increasePercent = function(item, diffVal) {
-        var min;
-        min = $scope.findMin();
+      $scope.increasePercent = function(item, min, diffVal) {
+        console.log("max decrease", min);
+        console.log("diff", diffVal);
         if (item.name === min.name) {
           item.percent += diffVal;
           if (item.percent > 100) {
@@ -66,9 +66,7 @@ app.directive("balancer", function() {
           }
         }
       };
-      $scope.decreasePercent = function(item, diffVal) {
-        var max;
-        max = $scope.findMax();
+      $scope.decreasePercent = function(item, max, diffVal) {
         console.log("max decrease", max);
         console.log("diff", diffVal);
         if (item.name === max.name) {
@@ -79,7 +77,7 @@ app.directive("balancer", function() {
         }
       };
       $scope.balance = function(index) {
-        var diffVal, item, items, length, notBlocked, _i, _j, _len, _len1;
+        var diffVal, item, items, length, max, min, notBlocked, _i, _j, _len, _len1;
         $scope.indexOfChanged = index;
         items = _.clone($scope.items);
         notBlocked = $scope.spliceItem($scope.items, $scope.items[$scope.indexOfChanged]);
@@ -87,15 +85,17 @@ app.directive("balancer", function() {
         diffVal = $scope.findDiff();
         if (length > 1 && notBlocked.length >= 1) {
           if (diffVal > 0) {
+            min = $scope.findMin();
             for (_i = 0, _len = items.length; _i < _len; _i++) {
               item = items[_i];
-              $scope.increasePercent(item, diffVal);
+              $scope.increasePercent(item, min, diffVal);
             }
           }
           if (diffVal < 0) {
+            max = $scope.findMax();
             for (_j = 0, _len1 = items.length; _j < _len1; _j++) {
               item = items[_j];
-              $scope.decreasePercent(item, diffVal);
+              $scope.decreasePercent(item, max, diffVal);
             }
           }
         }
@@ -110,8 +110,11 @@ app.directive("balancer", function() {
         }
         return sum;
       };
-      $scope.findMinVal = function() {
+      $scope.findMinVal = function(item) {
         var items, min, notBlocked;
+        if (item !== void 0 && item.blocked) {
+          return;
+        }
         min = 0;
         notBlocked = [];
         items = _.clone($scope.items);
@@ -125,8 +128,11 @@ app.directive("balancer", function() {
         });
         return min;
       };
-      return $scope.findMaxVal = function() {
+      return $scope.findMaxVal = function(item) {
         var items, max;
+        if (item !== void 0 && item.blocked) {
+          return;
+        }
         items = _.clone($scope.items);
         max = 100;
         angular.forEach(items, function(item) {

@@ -52,8 +52,9 @@ app.directive "balancer", () ->
       )
       min
 
-    $scope.increasePercent = (item, diffVal) ->
-      min = do $scope.findMin
+    $scope.increasePercent = (item, min, diffVal) ->
+      console.log "max decrease", min
+      console.log "diff", diffVal
       if item.name == min.name
         item.percent += diffVal
 
@@ -61,8 +62,7 @@ app.directive "balancer", () ->
           item.percent = 100
 #          do $scope.balance
 
-    $scope.decreasePercent = (item, diffVal) ->
-      max = do $scope.findMax
+    $scope.decreasePercent = (item, max, diffVal) ->
       console.log "max decrease", max
       console.log "diff", diffVal
       if item.name == max.name
@@ -81,10 +81,12 @@ app.directive "balancer", () ->
 
       if length > 1  and notBlocked.length >= 1
         if diffVal > 0
-          ($scope.increasePercent item, diffVal) for item in items
+          min = do $scope.findMin
+          ($scope.increasePercent item, min, diffVal) for item in items
 
         if diffVal < 0
-          ($scope.decreasePercent item, diffVal) for item in items
+          max = do $scope.findMax
+          ($scope.decreasePercent item, max, diffVal) for item in items
 
       $scope.items = _.clone items
 
@@ -93,7 +95,8 @@ app.directive "balancer", () ->
       (sum += item.percent) for item in items
       sum
 
-    $scope.findMinVal = () ->
+    $scope.findMinVal = (item) ->
+      return if item != undefined && item.blocked
       min = 0
       notBlocked = []
       items = _.clone $scope.items
@@ -109,7 +112,8 @@ app.directive "balancer", () ->
       )
       min
 
-    $scope.findMaxVal = () ->
+    $scope.findMaxVal = (item) ->
+      return if item != undefined && item.blocked
       items = _.clone $scope.items
       max = 100
       angular.forEach(
