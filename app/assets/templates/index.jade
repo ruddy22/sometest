@@ -29,6 +29,7 @@ html
                 div(class="col-xs-4") Result
                   div(ng-repeat="item in model" )
                     span {{ item.name }}: {{ item.percent | number:2}}
+                  div Sum {{ currentSum | number:2 }}
                 div(class="col-xs-4") data before modification
                   div(ng-repeat="item in currentData")
                     span {{ item }}

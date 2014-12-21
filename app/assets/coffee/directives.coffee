@@ -7,6 +7,10 @@ app.directive "balancer", () ->
   controller: ($scope, defaultSum)->
     $scope.indexOfChanged = null
 
+    $scope.setZero = ->
+      console.log "init"
+      item.percent = 0 for item in $scope.items when item.percent != 100
+
     $scope.findSum = ->
       sum = 0
       (sum += item.percent) for item in $scope.items
@@ -53,24 +57,21 @@ app.directive "balancer", () ->
       min
 
     $scope.increasePercent = (item, min, diffVal) ->
-      console.log "max decrease", min
-      console.log "diff", diffVal
       if item.name == min.name
         item.percent += diffVal
 
         if item.percent > 100
           item.percent = 100
-#          do $scope.balance
 
     $scope.decreasePercent = (item, max, diffVal) ->
-      console.log "max decrease", max
-      console.log "diff", diffVal
       if item.name == max.name
         item.percent += diffVal
 
+        if $scope.items[$scope.indexOfChanged].percent == 100
+          do $scope.setZero
+
         if item.percent < 0
           item.percent = 0
-#          do $scope.balance
 
     $scope.balance = (index)->
       $scope.indexOfChanged = index
@@ -78,6 +79,7 @@ app.directive "balancer", () ->
       notBlocked = $scope.spliceItem $scope.items, $scope.items[$scope.indexOfChanged]
       length = items.length
       diffVal = do $scope.findDiff
+      diffVal = parseFloat diffVal.toFixed(2)
 
       if length > 1  and notBlocked.length >= 1
         if diffVal > 0
@@ -87,6 +89,8 @@ app.directive "balancer", () ->
         if diffVal < 0
           max = do $scope.findMax
           ($scope.decreasePercent item, max, diffVal) for item in items
+
+      return
 
       $scope.items = _.clone items
 

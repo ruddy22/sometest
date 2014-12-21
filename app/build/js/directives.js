@@ -8,6 +8,19 @@ app.directive("balancer", function() {
     },
     controller: function($scope, defaultSum) {
       $scope.indexOfChanged = null;
+      $scope.setZero = function() {
+        var item, _i, _len, _ref, _results;
+        console.log("init");
+        _ref = $scope.items;
+        _results = [];
+        for (_i = 0, _len = _ref.length; _i < _len; _i++) {
+          item = _ref[_i];
+          if (item.percent !== 100) {
+            _results.push(item.percent = 0);
+          }
+        }
+        return _results;
+      };
       $scope.findSum = function() {
         var item, sum, _i, _len, _ref;
         sum = 0;
@@ -57,8 +70,6 @@ app.directive("balancer", function() {
         return min;
       };
       $scope.increasePercent = function(item, min, diffVal) {
-        console.log("max decrease", min);
-        console.log("diff", diffVal);
         if (item.name === min.name) {
           item.percent += diffVal;
           if (item.percent > 100) {
@@ -67,10 +78,11 @@ app.directive("balancer", function() {
         }
       };
       $scope.decreasePercent = function(item, max, diffVal) {
-        console.log("max decrease", max);
-        console.log("diff", diffVal);
         if (item.name === max.name) {
           item.percent += diffVal;
+          if ($scope.items[$scope.indexOfChanged].percent === 100) {
+            $scope.setZero();
+          }
           if (item.percent < 0) {
             return item.percent = 0;
           }
@@ -83,6 +95,7 @@ app.directive("balancer", function() {
         notBlocked = $scope.spliceItem($scope.items, $scope.items[$scope.indexOfChanged]);
         length = items.length;
         diffVal = $scope.findDiff();
+        diffVal = parseFloat(diffVal.toFixed(2));
         if (length > 1 && notBlocked.length >= 1) {
           if (diffVal > 0) {
             min = $scope.findMin();
@@ -99,6 +112,7 @@ app.directive("balancer", function() {
             }
           }
         }
+        return;
         return $scope.items = _.clone(items);
       };
       $scope.findCurrentSum = function(items) {

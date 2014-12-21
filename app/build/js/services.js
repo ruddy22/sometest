@@ -31,7 +31,7 @@ app.service("Data", function() {
     items: [
       {
         name: "item1",
-        percent: 70
+        percent: 60
       }, {
         name: "item2",
         percent: 30

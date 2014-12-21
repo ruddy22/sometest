@@ -2,6 +2,7 @@ app.controller "MainCtrl", ($scope, $window, defaultSum, Data) ->
   $scope.model = []
   $window.model = $scope.model
   $scope.currentData = []
+  $scope.currentSum = null
   $scope.defSum = defaultSum
 
   sumCompute = (items) ->
@@ -60,4 +61,11 @@ app.controller "MainCtrl", ($scope, $window, defaultSum, Data) ->
   $scope.setDataTwice = ->
     $scope.init Data.dataTwice
 
+  $scope.$watch(
+    ->
+      $scope.model
+  ,
+    ->
+      $scope.currentSum = sumCompute($scope.model)
+  )
   return

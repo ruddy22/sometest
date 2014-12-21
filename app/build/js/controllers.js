@@ -3,6 +3,7 @@ app.controller("MainCtrl", function($scope, $window, defaultSum, Data) {
   $scope.model = [];
   $window.model = $scope.model;
   $scope.currentData = [];
+  $scope.currentSum = null;
   $scope.defSum = defaultSum;
   sumCompute = function(items) {
     var sum;
@@ -74,6 +75,11 @@ app.controller("MainCtrl", function($scope, $window, defaultSum, Data) {
   $scope.setDataTwice = function() {
     return $scope.init(Data.dataTwice);
   };
+  $scope.$watch(function() {
+    return $scope.model;
+  }, function() {
+    return $scope.currentSum = sumCompute($scope.model);
+  });
 });
 
 //# sourceMappingURL=maps/controllers.js.map
