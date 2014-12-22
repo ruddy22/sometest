@@ -19,3 +19,11 @@ usage:
 1. run:
     - for mac os: gulp
     - for linux: ./gulp
+
+tests:
+======
+after build project
+{} - optional params
+1. run:
+    - for mac os: karma start {karma.conf.js}
+    - for linux: ./karma start {karma.conf.js}
